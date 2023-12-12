@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "InteractionComponent.generated.h"
 
+class UDataAsset;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SYSTEMSPLUGIN_API UInteractionComponent : public UActorComponent
@@ -28,12 +29,19 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	class UInputMappingContext* InputMapping;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	UDataAsset* InputActions;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace")
+	float TraceDistance = 500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace")
+	bool bDebugInteraction = true;
 
 protected:
 	bool CanInteract();
 
 	void StartInteraction();
 
-private:
 	void SetupPlayerInput(class UInputComponent* PlayerInput);
 };
