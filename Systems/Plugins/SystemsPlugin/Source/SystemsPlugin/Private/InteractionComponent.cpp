@@ -65,7 +65,6 @@ void UInteractionComponent::StartInteraction()
 			{
 				IInteractInterface::Execute_OnInteracted(OutHit.GetActor());
 				UE_LOG(LogTemp, Warning, TEXT("Actor has interface, calling OnInteracted On hit actor"));
-
 			}
 			else
 			{
