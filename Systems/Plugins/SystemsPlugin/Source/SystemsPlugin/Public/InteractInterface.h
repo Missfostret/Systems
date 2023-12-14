@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "GameFramework/Pawn.h"
 #include "InteractInterface.generated.h"
 
 // This class does not need to be modified.
@@ -23,5 +24,10 @@ class SYSTEMSPLUGIN_API IInteractInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void OnInteracted();
+	void OnInteracted(APawn* InteractingActor);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	float InteractionTime();
+
+
 };

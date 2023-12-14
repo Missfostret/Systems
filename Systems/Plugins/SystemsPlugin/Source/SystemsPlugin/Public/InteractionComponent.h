@@ -7,6 +7,8 @@
 #include "InteractionComponent.generated.h"
 
 class UDataAsset;
+class UInteractInterface;
+class APawn;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SYSTEMSPLUGIN_API UInteractionComponent : public UActorComponent
@@ -43,5 +45,17 @@ protected:
 
 	void StartInteraction();
 
+	FHitResult LineTraceInteraction();
+
+	bool TryInteract(bool bHasInterface, AActor* HitActor, APawn* InOwningPawn);
+
+	bool InteractionInstant(float InInteractionTime);
+
 	void SetupPlayerInput(class UInputComponent* PlayerInput);
+
+private:
+	void DebugInteractionLineTrace(FVector StartLocation, FVector EndLocation, bool bHit);
+
+private:
+	APawn* OwningPawn;
 };
