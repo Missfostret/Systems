@@ -27,6 +27,9 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void OnInteractionTick(float InInteractionTime);
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	class UInputMappingContext* InputMapping;
@@ -41,15 +44,21 @@ public:
 	bool bDebugInteraction = true;
 
 protected:
-	bool CanInteract();
-
-	void StartInteraction();
-
 	FHitResult LineTraceInteraction();
-
+	bool CanInteract();
+	void StartInteraction();
 	bool TryInteract(bool bHasInterface, AActor* HitActor, APawn* InOwningPawn);
+	void Interact();
+	bool IsInteractionInstant(float InInteractionTime);
+	void OnGoingInteraction(float InInteractionTime);
+	void CancelInteraction();
+	void StopInteraction();
+	void ResetInteraction();
 
-	bool InteractionInstant(float InInteractionTime);
+
+
+
+
 
 	void SetupPlayerInput(class UInputComponent* PlayerInput);
 
@@ -58,4 +67,10 @@ private:
 
 private:
 	APawn* OwningPawn;
+
+	class AActor* InteractingActor;
+	bool bIsInteracting = false;
+	bool bInstantInteraction = false;
+	float InteractionTime = -1.0f;
+	float CurrentInteractionTime = 0.0f;
 };

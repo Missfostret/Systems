@@ -33,11 +33,23 @@ void UInteractionComponent::BeginPlay()
 void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	//TODO@: Add the OngoingInteraction() so the blueprint OnInteractionTick() is being updated
+	// Only update if an interactiontime is over 0.0f otherwise just make the interaction instant
+	if (InteractionTime > 0.0f)
+	{
+		OnGoingInteraction(CurrentInteractionTime);
+		CurrentInteractionTime += DeltaTime;
+		if (CurrentInteractionTime >= InteractionTime)
+		{
+			Interact();
+		}
+	}
 }
 
 bool UInteractionComponent::CanInteract()
 {
-	return true;
+	return !bIsInteracting;
 }
 
 void UInteractionComponent::StartInteraction()
@@ -46,24 +58,25 @@ void UInteractionComponent::StartInteraction()
 
 	if (CanInteract())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Cant Interact"));
+		UE_LOG(LogTemp, Warning, TEXT("Already Interacting Or Cant Interact"));
 		return;
 	}
 
+	bIsInteracting = true;
+
 	auto OutHit = LineTraceInteraction();
 		
-	if (OutHit.bBlockingHit)
+	if (!OutHit.bBlockingHit)
 	{
-		DebugInteractionLineTrace(OutHit.TraceStart, OutHit.TraceEnd, OutHit.bBlockingHit);
-
-		bool bHasCorrectInterface = OutHit.GetActor()->GetClass()->ImplementsInterface(UInteractInterface::StaticClass());
-		TryInteract(bHasCorrectInterface, OutHit.GetActor(), OwningPawn);
-	}
-	else
-	{
-		DebugInteractionLineTrace(OutHit.TraceStart, OutHit.TraceEnd, OutHit.bBlockingHit);
+		DebugInteractionLineTrace(OutHit.TraceStart, OutHit.TraceEnd, false);
 		UE_LOG(LogTemp, Warning, TEXT("No actor was hit"));
+		return;
 	}
+
+	DebugInteractionLineTrace(OutHit.TraceStart, OutHit.TraceEnd, true);
+
+	bool bHasInteractionInterface = OutHit.GetActor()->GetClass()->ImplementsInterface(UInteractInterface::StaticClass());
+	TryInteract(bHasInteractionInterface, OutHit.GetActor(), OwningPawn);
 }
 
 FHitResult UInteractionComponent::LineTraceInteraction()
@@ -99,6 +112,41 @@ void UInteractionComponent::SetupPlayerInput(UInputComponent* PlayerInput)
 
 	UInteractionInputConfigData* InputConfig = Cast<UInteractionInputConfigData>(InputActions);
 	PEI->BindAction(InputConfig->InputInteract, ETriggerEvent::Ongoing, this, &UInteractionComponent::StartInteraction);
+	PEI->BindAction(InputConfig->InputInteract, ETriggerEvent::Canceled, this, &UInteractionComponent::CancelInteraction);
+}
+
+void UInteractionComponent::OnGoingInteraction(float InInteractionTime)
+{
+	// TODO@: This is where the component updates what happens on tick
+	OnInteractionTick(InteractionTime);
+}
+
+void UInteractionComponent::OnInteractionTick_Implementation(float InInteractionTime)
+{
+
+}
+
+void UInteractionComponent::CancelInteraction()
+{
+	// TODO@: Implement Cancel Interaction logic
+	StopInteraction();
+	UE_LOG(LogTemp, Warning, TEXT("Interaction Got Cancelled"));
+}
+
+void UInteractionComponent::StopInteraction()
+{
+	// TODO@: Implement Stop Interaction logic
+	ResetInteraction();
+	UE_LOG(LogTemp, Warning, TEXT("Interaction Got Stopped"));
+}
+
+void UInteractionComponent::ResetInteraction()
+{
+	bIsInteracting = false;
+	bInstantInteraction = false;
+	InteractionTime = -1.0f;
+	CurrentInteractionTime = 0.0f;
+	InteractingActor = nullptr;
 }
 
 void UInteractionComponent::DebugInteractionLineTrace(FVector StartLocation, FVector EndLocation, bool bHit)
@@ -114,13 +162,16 @@ bool UInteractionComponent::TryInteract(bool bHasInterface, AActor* HitActor, AP
 {
 	if (!bHasInterface)
 	{
+		CancelInteraction();
 		return false;
 	}
 	
-	auto InteractionTime = IInteractInterface::Execute_InteractionTime(HitActor);
+	InteractionTime = IInteractInterface::Execute_InteractionTime(HitActor);
+	InteractingActor = HitActor;
 
-	if (!InteractionInstant(InteractionTime))
+	if (!IsInteractionInstant(InteractionTime))
 	{
+		bInstantInteraction = false;
 		//TODO@ Add interaction time here
 		// Maybe enable component tick and tick an interaction time up to the set interaction time
 		return false;
@@ -128,12 +179,19 @@ bool UInteractionComponent::TryInteract(bool bHasInterface, AActor* HitActor, AP
 
 	//TODO@ Interaction is instant, should only be able to trace once if hit something
 	// Set CanInteract to false
-	IInteractInterface::Execute_OnInteracted(HitActor, OwningPawn);
+	bInstantInteraction = true;
+	IInteractInterface::Execute_OnInteracted(InteractingActor, OwningPawn);
 	UE_LOG(LogTemp, Warning, TEXT("Actor has interface, calling OnInteracted On hit actor"));
 	return true;
 }
 
-bool UInteractionComponent::InteractionInstant(float InInteractionTime)
+void UInteractionComponent::Interact()
 {
-	return InInteractionTime <= 0.0f;
+	IInteractInterface::Execute_OnInteracted(InteractingActor, OwningPawn);
+	ResetInteraction();
+}
+
+bool UInteractionComponent::IsInteractionInstant(float InInteractionTime)
+{
+	return bInstantInteraction = InInteractionTime <= 0.0f;
 }

@@ -29,5 +29,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	float InteractionTime();
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	float OngoingInteract();
+
 
 };
