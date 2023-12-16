@@ -9,8 +9,9 @@
 class UDataAsset;
 class UInteractInterface;
 class APawn;
+class USystemsUserWidget;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SYSTEMSPLUGIN_API UInteractionComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -28,7 +29,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void OnInteractionTick(float InInteractionTime);
+	void OnInteractionTick(float InInteractionTime, float NormalizedInteractionTime);
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
@@ -43,7 +44,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace")
 	bool bDebugInteraction = true;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Widget")
+	USystemsUserWidget* InteractionWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget")
+	TSubclassOf<USystemsUserWidget> InteractionWidgetClass;
+
 protected:
+	// Interaction
 	FHitResult LineTraceInteraction();
 	bool CanInteract();
 	void StartInteraction();
@@ -55,14 +63,11 @@ protected:
 	void StopInteraction();
 	void ResetInteraction();
 
-
-
-
-
-
+	// Input
 	void SetupPlayerInput(class UInputComponent* PlayerInput);
 
 private:
+	// Debug
 	void DebugInteractionLineTrace(FVector StartLocation, FVector EndLocation, bool bHit);
 
 private:

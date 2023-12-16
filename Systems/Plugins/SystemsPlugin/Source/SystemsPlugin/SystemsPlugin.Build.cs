@@ -29,7 +29,8 @@ public class SystemsPlugin : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"InputCore",
-				"EnhancedInput"
+				"EnhancedInput",
+				"UMG"
 			}
 			);
 			
@@ -41,7 +42,8 @@ public class SystemsPlugin : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-                "EnhancedInput"
+                "EnhancedInput",
+				"UMG"
 				// ... add private dependencies that you statically link with here ...	
 			}
             );

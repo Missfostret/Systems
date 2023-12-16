@@ -30,7 +30,7 @@ public:
 	float InteractionTime();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	float OngoingInteract(float InInteractionTime);
+	float OngoingInteract(float InInteractionTime, float NormalizedTime);
 
 
 };

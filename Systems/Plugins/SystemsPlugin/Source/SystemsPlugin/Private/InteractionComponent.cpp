@@ -13,12 +13,12 @@
 #include "Kismet/KismetMathLibrary.h"
 
 #include "InteractionInputConfigData.h"
-#include "InteractionInputConfigData.h"
 
+#include "SystemsUserWidget.h"
 
 UInteractionComponent::UInteractionComponent()
 {
-	PrimaryComponentTick.bStartWithTickEnabled = true;
+	PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
 void UInteractionComponent::BeginPlay()
@@ -30,14 +30,15 @@ void UInteractionComponent::BeginPlay()
 
 	SetupPlayerInput(OwningPawn->InputComponent);
 
+	InteractionWidget = Cast<USystemsUserWidget>(CreateWidget(GetWorld(), InteractionWidgetClass));
+	ensure(InteractionWidget);
+
 }
 
 void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	//TODO@: Add the OngoingInteraction() so the blueprint OnInteractionTick() is being updated
-	// Only update if an interactiontime is over 0.0f otherwise just make the interaction instant
 	if (InteractionTime > 0.0f)
 	{
 		OnGoingInteraction(CurrentInteractionTime);
@@ -57,7 +58,6 @@ bool UInteractionComponent::CanInteract()
 
 void UInteractionComponent::StartInteraction()
 {
-	// TODO@ Add interaction time, some interactions should be instant and others require a set amount of time
 
 	if (!CanInteract())
 	{
@@ -116,38 +116,34 @@ void UInteractionComponent::SetupPlayerInput(UInputComponent* PlayerInput)
 	UEnhancedInputComponent* PEI = Cast<UEnhancedInputComponent>(PlayerInput);
 
 	UInteractionInputConfigData* InputConfig = Cast<UInteractionInputConfigData>(InputActions);
-	PEI->BindAction(InputConfig->InputInteract, ETriggerEvent::Triggered, this, &UInteractionComponent::StartInteraction);
-
-	// TODO@: Find a way to cancel the input and interaction when you let go of the button
-	PEI->BindAction(InputConfig->InputInteract, ETriggerEvent::Canceled, this, &UInteractionComponent::CancelInteraction);
+	PEI->BindAction(InputConfig->InputInteract, ETriggerEvent::Started, this, &UInteractionComponent::StartInteraction);
+	PEI->BindAction(InputConfig->InputInteract, ETriggerEvent::Completed, this, &UInteractionComponent::StopInteraction);
 }
 
 void UInteractionComponent::OnGoingInteraction(float InInteractionTime)
 {
-	// TODO@: This is where the component updates what happens on tick
 	if (ActorInteractedWith)
 	{
-		OnInteractionTick(InteractionTime);
-		IInteractInterface::Execute_OngoingInteract(ActorInteractedWith, CurrentInteractionTime);
+		float NormalizedValue = InInteractionTime / InteractionTime;
+		OnInteractionTick(InInteractionTime, NormalizedValue);
+		IInteractInterface::Execute_OngoingInteract(ActorInteractedWith, CurrentInteractionTime, NormalizedValue);
+		IInteractInterface::Execute_OngoingInteract(InteractionWidget, CurrentInteractionTime, NormalizedValue);
 	}
-
 }
 
-void UInteractionComponent::OnInteractionTick_Implementation(float InInteractionTime)
+void UInteractionComponent::OnInteractionTick_Implementation(float InInteractionTime, float NormalizedInteractionTime)
 {
 
 }
 
 void UInteractionComponent::CancelInteraction()
 {
-	// TODO@: Implement Cancel Interaction logic
 	StopInteraction();
 	UE_LOG(LogTemp, Warning, TEXT("Interaction Got Cancelled"));
 }
 
 void UInteractionComponent::StopInteraction()
 {
-	// TODO@: Implement Stop Interaction logic
 	ResetInteraction();
 	UE_LOG(LogTemp, Warning, TEXT("Interaction Got Stopped"));
 }
@@ -159,6 +155,9 @@ void UInteractionComponent::ResetInteraction()
 	InteractionTime = -1.0f;
 	CurrentInteractionTime = 0.0f;
 	ActorInteractedWith = nullptr;
+
+	if(InteractionWidget->IsInViewport())
+		InteractionWidget->RemoveFromParent();
 }
 
 void UInteractionComponent::DebugInteractionLineTrace(FVector StartLocation, FVector EndLocation, bool bHit)
@@ -185,16 +184,13 @@ bool UInteractionComponent::TryInteract(bool bHasInterface, AActor* HitActor, AP
 	{
 		bInstantInteraction = false;
 		SetComponentTickEnabled(true);
-		//TODO@ Add interaction time here
-		// Maybe enable component tick and tick an interaction time up to the set interaction time
+		if (!InteractionWidget->IsInViewport())
+			InteractionWidget->AddToViewport(0);
 		return false;
 	}
 
-	//TODO@ Interaction is instant, should only be able to trace once if hit something
-	// Set CanInteract to false
 	bInstantInteraction = true;
-	IInteractInterface::Execute_OnInteracted(ActorInteractedWith, OwningPawn);
-	UE_LOG(LogTemp, Warning, TEXT("Actor has interface, calling OnInteracted On hit actor"));
+	Interact();
 	return true;
 }
 
@@ -202,6 +198,7 @@ void UInteractionComponent::Interact()
 {
 	IInteractInterface::Execute_OnInteracted(ActorInteractedWith, OwningPawn);
 	ResetInteraction();
+	UE_LOG(LogTemp, Warning, TEXT("Interaction finished"));
 }
 
 bool UInteractionComponent::IsInteractionInstant(float InInteractionTime)
