@@ -68,7 +68,7 @@ private:
 private:
 	APawn* OwningPawn;
 
-	class AActor* InteractingActor;
+	class AActor* ActorInteractedWith;
 	bool bIsInteracting = false;
 	bool bInstantInteraction = false;
 	float InteractionTime = -1.0f;
