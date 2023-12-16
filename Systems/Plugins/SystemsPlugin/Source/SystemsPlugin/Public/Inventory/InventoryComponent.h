@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
+class UInventoryBase;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SYSTEMSPLUGIN_API UInventoryComponent : public UActorComponent
@@ -16,9 +17,18 @@ public:
 	// Sets default values for this component's properties
 	UInventoryComponent();
 
+	TSubclassOf<UInventoryBase> InventoryType;
+
+
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	UPROPERTY()
+	UInventoryBase* Inventory;
+
+
 
 public:	
 	// Called every frame

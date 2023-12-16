@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InventoryBase.h"
+#include "Inventory/InventoryBase.h"
 #include "RPGInventory.generated.h"
 
 /**
@@ -14,5 +14,5 @@ class SYSTEMSPLUGIN_API URPGInventory : public UInventoryBase
 {
 	GENERATED_BODY()
 	
-	virtual void CreateInventory() override;
+public:
 };
