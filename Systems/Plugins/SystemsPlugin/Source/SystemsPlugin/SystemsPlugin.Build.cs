@@ -30,7 +30,8 @@ public class SystemsPlugin : ModuleRules
 				"Engine",
 				"InputCore",
 				"EnhancedInput",
-				"UMG"
+				"UMG",
+				"SystemsPlugin"
 			}
 			);
 			
@@ -43,7 +44,8 @@ public class SystemsPlugin : ModuleRules
 				"Slate",
 				"SlateCore",
                 "EnhancedInput",
-				"UMG"
+				"UMG",
+                "SystemsPlugin"
 				// ... add private dependencies that you statically link with here ...	
 			}
             );
