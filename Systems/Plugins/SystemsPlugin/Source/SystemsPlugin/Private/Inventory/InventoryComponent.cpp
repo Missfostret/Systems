@@ -2,6 +2,7 @@
 
 
 #include "Inventory/InventoryComponent.h"
+#include "Inventory/InventoryBase.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -20,7 +21,13 @@ void UInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+	Inventory = NewObject<UInventoryBase>(GetTransientPackage(), InventoryType);
+	if (Inventory)
+	{
+		Inventory->CreateInventory();
+		OnInventoryCreated();
+		UE_LOG(LogTemp, Warning, TEXT("Creating inventory %s"), *Inventory->GetName());
+	}
 }
 
 

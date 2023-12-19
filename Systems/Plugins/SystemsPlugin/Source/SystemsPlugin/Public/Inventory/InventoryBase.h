@@ -9,51 +9,10 @@
 /**
  * 
  */
-USTRUCT(BlueprintType)
-struct FItemData
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadOnly)
-	FString Name;
-
-	UPROPERTY(BlueprintReadOnly)
-	FString Description;
-
-	FItemData() 
-	{
-		Name = "None";
-		Description = "None";
-	}
-};
-
-USTRUCT(BlueprintType)
-struct FGridCell
-{
-
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadOnly)
-	int Row;
-
-	UPROPERTY(BlueprintReadOnly)
-	int Column;
-
-	UPROPERTY(BlueprintReadOnly)
-	FItemData ItemInCell;
 
 
-	FGridCell() 
-	{
-		Row = -1;
-		Column = -1;
-	}
-};
 
-
-UCLASS()
+UCLASS(Blueprintable)
 class SYSTEMSPLUGIN_API UInventoryBase : public UObject
 {
 	GENERATED_BODY()
@@ -61,15 +20,15 @@ class SYSTEMSPLUGIN_API UInventoryBase : public UObject
 public:
 	virtual void CreateInventory();
 
-	FGridCell GetGridCellFromIndex(int InIndex);
-
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
-	int InventoryColumns;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
-	int InventoryRows;
-
-private:
-	TArray<FGridCell> Grid;
 };
+
+
+// TODO@: Inventories
+/**
+Unlimited Inventory aka "Weight based inventory", maybe have weight of items to hinder the player to carry too much but have no slots instead
+"Utility Belt" inventory, only carry a selected number of items and switch between items with hotkeys like 1-9 or something, usually games like CS and valorant, half life etc.
+Menu based inventory, bring up a menu where you can see and manage all your items, often slot based.
+
+Inventory pick up systems:
+Press a button to pick up a single item, can be paired with open inventory and display all items in the vicinity
+*/

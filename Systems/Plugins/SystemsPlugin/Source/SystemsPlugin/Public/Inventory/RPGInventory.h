@@ -15,4 +15,6 @@ class SYSTEMSPLUGIN_API URPGInventory : public UInventoryBase
 	GENERATED_BODY()
 	
 public:
+	void CreateInventory() override;
+	
 };

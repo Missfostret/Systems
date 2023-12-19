@@ -8,7 +8,7 @@
 
 class UInventoryBase;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SYSTEMSPLUGIN_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -17,22 +17,23 @@ public:
 	// Sets default values for this component's properties
 	UInventoryComponent();
 
-	TSubclassOf<UInventoryBase> InventoryType;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
+	UInventoryBase* Inventory;
 
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	UPROPERTY()
-	UInventoryBase* Inventory;
-
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
+	TSubclassOf<UInventoryBase> InventoryType;
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnInventoryCreated();
 		
 };
