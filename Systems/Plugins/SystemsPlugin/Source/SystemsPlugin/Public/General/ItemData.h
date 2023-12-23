@@ -21,11 +21,15 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	int ItemSpace;
 
+	UPROPERTY(BlueprintReadOnly)
+	bool bCanStack;
+
 	FItemData()
 	{
 		Name = "None";
 		Description = "None";
 		Direction = EDirection::None;
 		ItemSpace = 0;
+		bCanStack = false;
 	}
 };

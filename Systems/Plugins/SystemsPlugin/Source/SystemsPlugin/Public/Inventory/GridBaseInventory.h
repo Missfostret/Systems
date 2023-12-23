@@ -50,6 +50,8 @@ public:
 
 	void CreateInventory() override;
 
+	void AddItem(FItemData ItemToAdd);
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int InventoryColumns = 0;

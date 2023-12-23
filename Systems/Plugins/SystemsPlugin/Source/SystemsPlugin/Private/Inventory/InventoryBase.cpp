@@ -7,3 +7,7 @@ void UInventoryBase::CreateInventory()
 {
 
 }
+
+void UInventoryBase::AddItem()
+{
+}
