@@ -51,6 +51,10 @@ public:
 	void CreateInventory() override;
 
 	void AddItem(FItemData ItemToAdd);
+	
+	bool IsInventoryFull();
+
+	TArray<int> FindFreeSlot(const FGridCell InCell, EDirection Dir, int Size);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")

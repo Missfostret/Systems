@@ -38,16 +38,94 @@ void UGridBaseInventory::CreateInventory()
 
 void UGridBaseInventory::AddItem(FItemData ItemToAdd)
 {
-	int InventorySize = InventoryColumns * InventoryRows;
-	if (Grid.Num() >= InventorySize)
+	if (IsInventoryFull())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Inventory Full, Canceling Add Item"));
 		return;
 	}
 
-	// TODO@: Check if theres a slot free if the item takes 1 inventory space, if yes, check if item can stack stack and if we already have a stack thats not full then add that item to stack.
-	// if the item quantity of item your picking up is more than one then try and add as many items to the stack and then readd the rest of the items. and repeat the logic.
+	if (ItemToAdd.bCanStack)
+	{
+		// Find stack and add, if no stack was found, then add to new slot
+		// return
+	}
+
+	// if you get here, the item does not stack and you can just find empty slots for that item and add it to the inventory
+
+
+	// TODO@: 2. Check if theres a slot free if the item takes 1 inventory space, if yes, 
+	// check if item can stack stack and if we already have a stack thats not full then add that item to stack.
+	// if the item quantity of item your picking up is more than one then try and add as many items to the stack and then re-add the rest of the items. and repeat the logic.
 	// if the item takes up more than 1 slot then check the direction of that item and what slot is next to it in that direction, is the slot free? then add item to those slots otherwise try and find another slot.
 	// if the inventory is full do nothing, the way we check if the inventory is full should be a loop through the items and see if the slots are filled.
 
+}
+
+bool UGridBaseInventory::IsInventoryFull()
+{
+	for(FGridCell Cell : Grid)
+	{
+		if (Cell.ItemInCell.Name == "None")
+		{
+			return false;
+		}
+	}
+	return true;
+}
+/** Remember to check length if its empty then no cells was found */
+TArray<int> UGridBaseInventory::FindFreeSlot(const FGridCell InCell,EDirection Dir, int Size)
+{
+	//TODO@: 1.
+	//if right check current index + size ofc check if any of the cells are on a new row then we cant add item there since Item wouldnt fit in a straight line
+	//if left check current index - size same as with right
+	//if down do a for loop and check each cell with the inventoryColumn size and if one of the cells there is not empty you cant add item there, check this for each cell in the inventory grid
+	//if up the same as with left but instead do it in reverse, start at the item size in the for loop since the item would fit pointed upwards if its size is 3 and you start at row 0 or 1
+
+	TArray<int> FreeCellIndexes;
+	int Index = -1;
+	for (int i = 0; i < Grid.Num(); i++)
+	{
+		if (Grid[i].ItemInCell.Name == "None")
+		{
+			Index = i;
+			break;
+		}
+	}
+
+	switch (Dir)
+	{
+		case EDirection::None:
+			break;
+		case EDirection::Up:
+			break;
+		case EDirection::Left:
+			for (int i = Index; i > Size - Index; i--)
+			{
+				const FString newName = Grid[i].ItemInCell.Name;
+				if (Grid[i].ItemInCell.Name == "None")
+				{
+					FreeCellIndexes.Empty();
+					return FreeCellIndexes;
+				}
+				FreeCellIndexes.Add(i);
+			}
+			return FreeCellIndexes;
+			break;
+		case EDirection::Down:
+			break;
+		case EDirection::Right:
+			for (int i = Index; i < Size + Index; i++)
+			{
+				const FString newName = Grid[i].ItemInCell.Name;
+				if (Grid[i].ItemInCell.Name == "None")
+				{
+					FreeCellIndexes.Empty();
+					return FreeCellIndexes;
+				}
+				FreeCellIndexes.Add(i);
+			}
+			return FreeCellIndexes;
+			break;
+	}
+	return FreeCellIndexes;
 }
