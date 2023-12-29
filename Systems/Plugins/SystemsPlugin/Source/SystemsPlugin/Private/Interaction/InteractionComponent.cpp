@@ -133,7 +133,6 @@ void UInteractionComponent::OnGoingInteraction(float InInteractionTime)
 
 void UInteractionComponent::OnInteractionTick_Implementation(float InInteractionTime, float NormalizedInteractionTime)
 {
-
 }
 
 void UInteractionComponent::CancelInteraction()

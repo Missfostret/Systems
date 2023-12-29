@@ -27,12 +27,16 @@ public:
 	int Column;
 
 	UPROPERTY(BlueprintReadOnly)
+	bool bSlotFilled;
+
+	UPROPERTY(BlueprintReadOnly)
 	FItemData ItemInCell;
 
 	FGridCell()
 	{
 		Row = -1;
 		Column = -1;
+		bSlotFilled = false;
 	}
 };
 
@@ -50,11 +54,21 @@ public:
 
 	void CreateInventory() override;
 
+	UFUNCTION(BlueprintCallable)
 	void AddItem(FItemData ItemToAdd);
 	
 	bool IsInventoryFull();
 
-	TArray<int> FindFreeSlot(const FGridCell InCell, EDirection Dir, int Size);
+	void UpdateInventory();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnUpdateInventory();
+
+	/** Returns an array with length 0 if no free slot was found */
+	//TArray<int> FindFreeSlot(const FGridCell InCell, EDirection Dir, int Size);
+
+	/** Returns -1 if nothing was found */
+	int FindFreeSlot();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
