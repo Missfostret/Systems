@@ -51,22 +51,30 @@ void UGridBaseInventory::AddItem(FItemData ItemToAdd)
 	//}
 
 	// if you get here, the item does not stack and you can just find empty slots for that item and add it to the inventory
-	int FreeSlotIndex;
-	FreeSlotIndex = FindFreeSlot();
+	int FreeSlotIndex = FindFreeSlot();
 	if(FreeSlotIndex == -1)
 	{
 		// Found no free slot
 		UE_LOG(LogTemp, Warning, TEXT("Found no free slot"));
-
 		return;
 	}
 
 	// Fill free slot with item and tell the slot that its full
 	Grid[FreeSlotIndex].ItemInCell = ItemToAdd;
 	Grid[FreeSlotIndex].bSlotFilled = true;
-	UE_LOG(LogTemp, Warning, TEXT("Filling slot %s x %d"), Grid[FreeSlotIndex].Column, Grid[FreeSlotIndex].Row);
+	//UE_LOG(LogTemp, Warning, TEXT("Filling slot %s x %d"), Grid[FreeSlotIndex].Column, Grid[FreeSlotIndex].Row);
+	FString MyString = "Filling slot ";
+	MyString += FString::FromInt(Grid[FreeSlotIndex].Column);
+	MyString += " x ";
+	MyString += FString::FromInt(Grid[FreeSlotIndex].Row);
 
-	UpdateInventory();
+
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *MyString);
+
+
+	return;
+	//UpdateInventory();
 
 	// TODO@: 2. Check if theres a slot free if the item takes 1 inventory space, if yes, 
 	// check if item can stack stack and if we already have a stack thats not full then add that item to stack.
