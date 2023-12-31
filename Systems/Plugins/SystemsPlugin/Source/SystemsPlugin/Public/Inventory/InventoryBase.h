@@ -20,6 +20,9 @@ class SYSTEMSPLUGIN_API UInventoryBase : public UObject
 public:
 	virtual void CreateInventory();
 
+	UPROPERTY(BlueprintReadOnly)
+	class UActorComponent* Owner;
+
 };
 
 

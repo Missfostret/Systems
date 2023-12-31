@@ -21,9 +21,10 @@ void UInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	Inventory = NewObject<UInventoryBase>(GetTransientPackage(), InventoryType);
+	Inventory = NewObject<UInventoryBase>(this, InventoryType);
 	if (Inventory)
 	{
+		Inventory->Owner = this;
 		Inventory->CreateInventory();
 		OnInventoryCreated();
 		UE_LOG(LogTemp, Warning, TEXT("Creating inventory %s"), *Inventory->GetName());

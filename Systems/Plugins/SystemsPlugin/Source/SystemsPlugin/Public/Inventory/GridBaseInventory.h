@@ -46,6 +46,9 @@ class SYSTEMSPLUGIN_API UGridBaseInventory : public UInventoryBase
 	GENERATED_BODY()
 	
 public:
+	UGridBaseInventory();
+
+
 	UFUNCTION(BlueprintPure)
 	FGridCell GetGridCellFromIndex(int InIndex);
 
@@ -55,7 +58,7 @@ public:
 	void CreateInventory() override;
 
 	UFUNCTION(BlueprintCallable)
-	void AddItem(FItemData ItemToAdd);
+	bool AddItem(FItemData ItemToAdd);
 	
 	bool IsInventoryFull();
 
@@ -63,6 +66,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnUpdateInventory();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnItemAddedToSlot(FItemData InItem, int InIndex);
 
 	/** Returns an array with length 0 if no free slot was found */
 	//TArray<int> FindFreeSlot(const FGridCell InCell, EDirection Dir, int Size);

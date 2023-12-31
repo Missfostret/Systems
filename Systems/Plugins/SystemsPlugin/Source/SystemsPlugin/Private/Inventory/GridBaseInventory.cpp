@@ -4,6 +4,11 @@
 #include "Inventory/GridBaseInventory.h"
 #include "General/ItemData.h"
 
+UGridBaseInventory::UGridBaseInventory()
+{
+
+}
+
 FGridCell UGridBaseInventory::GetGridCellFromIndex(int InIndex)
 {
 	return Grid[InIndex];
@@ -36,19 +41,13 @@ void UGridBaseInventory::CreateInventory()
 	}
 }
 
-void UGridBaseInventory::AddItem(FItemData ItemToAdd)
+bool UGridBaseInventory::AddItem(FItemData ItemToAdd)
 {
 	if (IsInventoryFull())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Inventory Full, Canceling Add Item"));
-		return;
+		return false;
 	}
-
-	//if (ItemToAdd.bCanStack)
-	//{
-	//	// Find stack and add, if no stack was found, then add to new slot
-	//	// return
-	//}
 
 	// if you get here, the item does not stack and you can just find empty slots for that item and add it to the inventory
 	int FreeSlotIndex = FindFreeSlot();
@@ -56,25 +55,22 @@ void UGridBaseInventory::AddItem(FItemData ItemToAdd)
 	{
 		// Found no free slot
 		UE_LOG(LogTemp, Warning, TEXT("Found no free slot"));
-		return;
+		return false;
 	}
 
 	// Fill free slot with item and tell the slot that its full
 	Grid[FreeSlotIndex].ItemInCell = ItemToAdd;
 	Grid[FreeSlotIndex].bSlotFilled = true;
-	//UE_LOG(LogTemp, Warning, TEXT("Filling slot %s x %d"), Grid[FreeSlotIndex].Column, Grid[FreeSlotIndex].Row);
+
+	OnItemAddedToSlot(ItemToAdd, FreeSlotIndex);
+
 	FString MyString = "Filling slot ";
 	MyString += FString::FromInt(Grid[FreeSlotIndex].Column);
 	MyString += " x ";
 	MyString += FString::FromInt(Grid[FreeSlotIndex].Row);
-
-
-
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *MyString);
 
-
-	return;
-	//UpdateInventory();
+	return true;
 
 	// TODO@: 2. Check if theres a slot free if the item takes 1 inventory space, if yes, 
 	// check if item can stack stack and if we already have a stack thats not full then add that item to stack.
@@ -101,79 +97,11 @@ void UGridBaseInventory::UpdateInventory()
 	OnUpdateInventory_Implementation();
 }
 
-
 // Leave this empty since its a blueprint event
 void UGridBaseInventory::OnUpdateInventory_Implementation()
 {
 
 }
-
-//TArray<int> UGridBaseInventory::FindFreeSlot(const FGridCell InCell,EDirection Dir, int Size)
-//{
-//	//TODO@: 1.
-//	//if right check current index + size ofc check if any of the cells are on a new row then we cant add item there since Item wouldnt fit in a straight line
-//	//if left check current index - size same as with right
-//	//if down do a for loop and check each cell with the inventoryColumn size and if one of the cells there is not empty you cant add item there, check this for each cell in the inventory grid
-//	//if up the same as with left but instead do it in reverse, start at the item size in the for loop since the item would fit pointed upwards if its size is 3 and you start at row 0 or 1
-//
-//	/*TArray<int> FreeCellIndexes;
-//	int Index = -1;
-//	for (int i = 0; i < Grid.Num(); i++)
-//	{
-//		if (!Grid[i].bSlotFilled)
-//		{
-//			Index = i;
-//			break;
-//		}
-//	}*/
-//
-//	/*switch (Dir)
-//	{
-//		case EDirection::None:
-//			break;
-//		case EDirection::Up:
-//			break;
-//		case EDirection::Left:
-//			for (int i = Index; i > Size - Index; i--)
-//			{
-//				const FString newName = Grid[i].ItemInCell.Name;
-//				if (Grid[i].ItemInCell.Name == "None")
-//				{
-//					FreeCellIndexes.Empty();
-//					return FreeCellIndexes;
-//				}
-//				FreeCellIndexes.Add(i);
-//			}
-//			return FreeCellIndexes;
-//			break;
-//		case EDirection::Down:
-//			break;
-//		case EDirection::Right:
-//			for (int i = Index; i < Size + Index; i++)
-//			{
-//				const FString newName = Grid[i].ItemInCell.Name;
-//				if (Grid[i].ItemInCell.Name == "None")
-//				{
-//					FreeCellIndexes.Empty();
-//					return FreeCellIndexes;
-//				}
-//				FreeCellIndexes.Add(i);
-//			}
-//			return FreeCellIndexes;
-//			break;
-//	}
-//	return FreeCellIndexes;*/
-//
-//
-//	//for(FGridCell Cell : Grid)
-//	//{
-//	//	if (!Cell.bSlotFilled)
-//	//	{
-//	//		return Cell;
-//	//	}
-//	//}
-//	
-//}
 
 int UGridBaseInventory::FindFreeSlot()
 {

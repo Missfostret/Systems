@@ -16,6 +16,9 @@ public:
 	FString Description;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	class UTexture2D* Image;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TEnumAsByte<EDirection> Direction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -28,6 +31,7 @@ public:
 	{
 		Name = "None";
 		Description = "None";
+		Image = nullptr;
 		Direction = EDirection::None;
 		ItemSpace = 0;
 		bCanStack = false;
